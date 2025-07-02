@@ -1,8 +1,9 @@
 import Phaser from "phaser"
 
-export default class PiezaTablero extends Phaser.GameObjects.Group {
+export default class PiezaTablero extends Phaser.GameObjects.Container {
     constructor(scene, imageKey, origen, config) {
         super(scene)
+        this.scene = scene
         this.imageKey = imageKey
         this.config = config
         this.origen = origen
@@ -44,23 +45,26 @@ export default class PiezaTablero extends Phaser.GameObjects.Group {
 
     abajoIzquierda() {
         const pm = (this.config.pieceWidth - this.config.pivote) / 2
-        const sprite = this.create(this.origen.x, this.origen.y, this.imageKey)
+        const sprite = this.scene.add.sprite(this.origen.x, this.origen.y, this.imageKey)
         sprite.setOrigin(0)
         sprite.setCrop(this.config.pivote, this.config.pieceHeight - this.config.pivote, pm - this.config.pivote, this.config.pivote)
+        this.add(sprite)
     }
 
     abajoCentro() {
         const puntoMedio = (this.config.pieceWidth - this.config.pivote) / 2
-        const sprite = this.create(this.origen.x, this.origen.y, this.imageKey)
+        const sprite = this.scene.add.sprite(this.origen.x, this.origen.y, this.imageKey)
         sprite.setOrigin(0)
         sprite.setCrop(puntoMedio, this.config.pieceHeight - this.config.pivote, this.config.pivote, this.config.pivote)
+        this.add(sprite)
     }
 
     abajoDerecha() {
         const pm = (this.config.pieceWidth - this.config.pivote) / 2
-        const sprite = this.create(this.origen.x, this.origen.y, this.imageKey)
+        const sprite = this.scene.add.sprite(this.origen.x, this.origen.y, this.imageKey)
         sprite.setOrigin(0)
         sprite.setCrop(pm + this.config.pivote, this.config.pieceHeight - this.config.pivote, pm, this.config.pivote)
+        this.add(sprite)
     }
 
     izquierda() {
@@ -74,88 +78,100 @@ export default class PiezaTablero extends Phaser.GameObjects.Group {
 
     izquierdaArriba() {
         const altura = (this.config.pieceHeight - this.config.pivote) / 2
-        const sprite = this.create(this.origen.x, this.origen.y, this.imageKey)
+        const sprite = this.scene.add.sprite(this.origen.x, this.origen.y, this.imageKey)
         sprite.setOrigin(0)
         sprite.setCrop(0, this.config.pivote, this.config.pivote, altura - this.config.pivote)
+        this.add(sprite)
     }
 
     izquierdaCentro() {
         const altura = (this.config.pieceHeight - this.config.pivote) / 2
-        const sprite = this.create(this.origen.x, this.origen.y, this.imageKey)
+        const sprite = this.scene.add.sprite(this.origen.x, this.origen.y, this.imageKey)
         sprite.setOrigin(0)
         sprite.setCrop(0, altura, this.config.pivote, this.config.pivote)
+        this.add(sprite)
     }
 
     izquierdaAbajo() {
         const altura = (this.config.pieceHeight - this.config.pivote) / 2
-        const sprite = this.create(this.origen.x, this.origen.y, this.imageKey)
+        const sprite = this.scene.add.sprite(this.origen.x, this.origen.y, this.imageKey)
         sprite.setOrigin(0)
         sprite.setCrop(0, altura + this.config.pivote, this.config.pivote, altura - this.config.pivote)
+        this.add(sprite)
     }
 
     esquinaIzqArriba() {
         if (this.tienePunta("left") || this.tienePunta("top")) {
             return
         }
-        const sprite = this.create(this.origen.x, this.origen.y, this.imageKey)
+        const sprite = this.scene.add.sprite(this.origen.x, this.origen.y, this.imageKey)
         sprite.setOrigin(0)
         sprite.setCrop(0, 0, this.config.pivote, this.config.pivote)
+        this.add(sprite)
     }
 
     esquinaIzqAbajo() {
         if (this.tienePunta("left") || this.tienePunta("bottom")) {
             return
         }
-        const sprite = this.create(this.origen.x, this.origen.y, this.imageKey)
+        const sprite = this.scene.add.sprite(this.origen.x, this.origen.y, this.imageKey)
         sprite.setOrigin(0)
         sprite.setCrop(0, this.config.pieceHeight - this.config.pivote, this.config.pivote, this.config.pivote)
+        this.add(sprite)
     }
 
     esquinaDerArriba() {
         if (this.tienePunta("top") || this.tienePunta("right")) {
             return
         }
-        const sprite = this.create(this.origen.x, this.origen.y, this.imageKey)
+        const sprite = this.scene.add.sprite(this.origen.x, this.origen.y, this.imageKey)
         sprite.setOrigin(0)
         sprite.setCrop(this.config.pieceWidth - this.config.pivote, 0, this.config.pivote, this.config.pivote)
+        this.add(sprite)        
     }
 
     esquinaDerAbajo() {
         if (this.tienePunta("bottom") || this.tienePunta("right")) {
             return
         }
-        const sprite = this.create(this.origen.x, this.origen.y, this.imageKey)
+        const sprite = this.scene.add.sprite(this.origen.x, this.origen.y, this.imageKey)
         sprite.setOrigin(0)
         sprite.setCrop(this.config.pieceWidth - this.config.pivote, this.config.pieceHeight - this.config.pivote, this.config.pivote, this.config.pivote)
+        this.add(sprite)
     }
 
     centro() {
         if (!this.existe("top")) {
-            const arriba = this.create(this.origen.x, this.origen.y, this.imageKey)
+            const arriba = this.scene.add.sprite(this.origen.x, this.origen.y, this.imageKey)
             arriba.setOrigin(0)
             arriba.setCrop(this.config.pivote, 0, this.config.pieceWidth - 2 * this.config.pivote, this.config.pivote)
+            this.add(arriba)
         }
 
         if (!this.existe("bottom")) {
-            const abajo = this.create(this.origen.x, this.origen.y, this.imageKey)
+            const abajo = this.scene.add.sprite(this.origen.x, this.origen.y, this.imageKey)
             abajo.setOrigin(0)
             abajo.setCrop(this.config.pivote, this.config.pieceHeight - this.config.pivote, this.config.pieceWidth - 2 * this.config.pivote, this.config.pivote)
+            this.add(abajo)
         }
 
         if (!this.existe("left")) {
-            const izq = this.create(this.origen.x, this.origen.y, this.imageKey)
+            const izq = this.scene.add.sprite(this.origen.x, this.origen.y, this.imageKey)
             izq.setOrigin(0)
             izq.setCrop(0, this.config.pivote, this.config.pivote, this.config.pieceHeight - 2 * this.config.pivote)
+            this.add(izq)
         }
 
         if (!this.existe("right")) {
-            const der = this.create(this.origen.x, this.origen.y, this.imageKey)
+            const der = this.scene.add.sprite(this.origen.x, this.origen.y, this.imageKey)
             der.setOrigin(0)
             der.setCrop(this.config.pieceWidth - this.config.pivote, this.config.pivote, this.config.pivote, this.config.pieceHeight - 2 * this.config.pivote)
+            this.add(der)
         }
 
-        const sprite = this.create(this.origen.x, this.origen.y, this.imageKey)
+        const sprite = this.scene.add.sprite(this.origen.x, this.origen.y, this.imageKey)
         sprite.setOrigin(0)
         sprite.setCrop(this.config.pivote, this.config.pivote, this.config.pieceWidth - 2 * this.config.pivote, this.config.pieceHeight - 2 * this.config.pivote)
+        this.add(sprite)
     }
 }

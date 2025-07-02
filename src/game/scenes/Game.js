@@ -75,7 +75,14 @@ export class Game extends Scene {
             }
         }
 
-        new Tablero(this, new Phaser.Geom.Point(50,50), piezas)
+        new Tablero(this, piezas, {
+            x: 0,
+            y: 0,
+            rows: 2,
+            cols: 4,
+            gap: 100
+        })
+
 
         this.keyboard = this.input.keyboard.createCursorKeys()
 
