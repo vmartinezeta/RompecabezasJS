@@ -1,5 +1,5 @@
 import { EventBus } from '../EventBus'
-import  { Scene } from 'phaser'
+import Phaser, { Scene } from 'phaser'
 import Tablero from '../sprites/Tablero'
 
 export class Game extends Scene {
@@ -8,20 +8,74 @@ export class Game extends Scene {
     }
 
     create() {
-        // this.add.image(512, 384, 'background')
         this.physics.world.setBounds(0, 0, 1024, 600)
 
         this.input.mouse.disableContextMenu()
 
-        new Tablero(this, {
-            x: 50,
-            y: 40,
-            rows: 2,
-            cols: 4,
-            pieceWidth: 160,
-            pieceHeight: 214,
-        })
+        const piezas = {
+            "pieza_1": {
+                pivote: 40,
+                pieceWidth: 200,
+                pieceHeight: 254,
+                right: true,
+                bottom: true
+            },
+            "pieza_2": {
+                pivote: 40,
+                pieceWidth: 160,
+                pieceHeight: 214,
+                right:false,
+                bottom: false,
+                left: false
+            },
+            "pieza_3": {
+                pivote: 40,
+                pieceWidth: 240,
+                pieceHeight: 254,
+                right:true,
+                bottom: true,
+                left: true
+            },
+            "pieza_4": {
+                pivote: 40,
+                pieceWidth: 160,
+                pieceHeight: 214,
+                top: false,
+                left: false
+            },
+            "pieza_5": {
+                pivote: 40,
+                pieceWidth: 160,
+                pieceHeight: 214,
+                top: false,
+                right: false
+            },
+            "pieza_6": {
+                pivote: 40,
+                pieceWidth: 240,
+                pieceHeight: 254,
+                top: true,
+                right: true,
+                left: true
+            },
+            "pieza_7": {
+                pivote: 40,
+                pieceWidth: 160,
+                pieceHeight: 214,
+                top: false,
+                right: false,
+                left: false
+            },
+            "pieza_8": {
+                pivote: 40,
+                pieceWidth: 200,
+                pieceHeight: 254,
+                top: true,
+                left: true
+            }
+        }
 
+        new Tablero(this, new Phaser.Geom.Point(50,50), piezas)
 
         this.keyboard = this.input.keyboard.createCursorKeys()
 
@@ -31,4 +85,5 @@ export class Game extends Scene {
     changeScene() {
         this.scene.start("MainMenu")
     }
+
 }
