@@ -5,8 +5,8 @@ export default class PiezaTablero extends Phaser.GameObjects.Container {
         super(scene)
         this.scene = scene
         this.imageKey = imageKey
-        this.config = config
         this.origen = origen
+        this.config = config
         this.arriba()
         this.derecha()
         this.abajo()
@@ -16,6 +16,7 @@ export default class PiezaTablero extends Phaser.GameObjects.Container {
         this.esquinaDerArriba()
         this.esquinaDerAbajo()
         this.centro()
+        scene.add.existing(this)
     }
 
     existe(property) {
@@ -30,9 +31,70 @@ export default class PiezaTablero extends Phaser.GameObjects.Container {
         return this.existe(property) && !this.config[property]
     }
 
-    arriba() { }
+    arriba() {
+        if (this.tienePunta("top")) {
+            this.arribaCentro()
+        } else if (this.tieneAgujero("top")) {
+            this.arribaIzquierda()
+            this.arribaDerecha()
+        }
+    }
 
-    derecha() { }
+    arribaCentro() {
+        const puntoMedio = (this.config.pieceWidth - this.config.pivote) / 2
+        const sprite = this.scene.add.sprite(this.origen.x, this.origen.y, this.imageKey)
+        sprite.setOrigin(0)
+        sprite.setCrop(puntoMedio, 0, this.config.pivote, this.config.pivote)
+        this.add(sprite)
+    }
+
+    arribaIzquierda() {
+        const pm = (this.config.pieceWidth - this.config.pivote) / 2
+        const sprite = this.scene.add.sprite(this.origen.x, this.origen.y, this.imageKey)
+        sprite.setOrigin(0)
+        sprite.setCrop(this.config.pivote, 0, pm - this.config.pivote, this.config.pivote)
+        this.add(sprite)
+    }
+    arribaDerecha() {
+        const pm = (this.config.pieceWidth - this.config.pivote) / 2
+        const sprite = this.scene.add.sprite(this.origen.x, this.origen.y, this.imageKey)
+        sprite.setOrigin(0)
+        sprite.setCrop(pm + this.config.pivote, 0, pm - this.config.pivote, this.config.pivote)
+        this.add(sprite)
+    }
+
+    derecha() {
+        if (this.tienePunta("right")) {
+            this.derechaCentro()
+        } else if (this.tieneAgujero("right")) {
+            this.derechaArriba()
+            this.derechaAbajo()
+        }
+    }
+
+    derechaCentro() {
+        const pm = (this.config.pieceHeight - this.config.pivote) / 2
+        const sprite = this.scene.add.sprite(this.origen.x, this.origen.y, this.imageKey)
+        sprite.setOrigin(0)
+        sprite.setCrop(this.config.pieceWidth - this.config.pivote,pm-this.config.pivote, this.config.pivote, this.config.pivote)
+        this.add(sprite)
+    }
+
+    derechaArriba() { 
+        const pm = (this.config.pieceHeight - this.config.pivote) / 2
+        const sprite = this.scene.add.sprite(this.origen.x, this.origen.y, this.imageKey)
+        sprite.setOrigin(0)
+        sprite.setCrop(this.config.pieceWidth-this.config.pivote, this.config.pivote, this.config.pivote, pm - this.config.pivote)
+        this.add(sprite)        
+    }
+
+    derechaAbajo() { 
+        const pm = (this.config.pieceHeight - this.config.pivote) / 2
+        const sprite = this.scene.add.sprite(this.origen.x, this.origen.y, this.imageKey)
+        sprite.setOrigin(0)
+        sprite.setCrop(this.config.pieceWidth-this.config.pivote, pm + this.config.pivote, this.config.pivote, pm - this.config.pivote)
+        this.add(sprite)        
+    }
 
     abajo() {
         if (this.tienePunta("bottom")) {
@@ -127,7 +189,7 @@ export default class PiezaTablero extends Phaser.GameObjects.Container {
         const sprite = this.scene.add.sprite(this.origen.x, this.origen.y, this.imageKey)
         sprite.setOrigin(0)
         sprite.setCrop(this.config.pieceWidth - this.config.pivote, 0, this.config.pivote, this.config.pivote)
-        this.add(sprite)        
+        this.add(sprite)
     }
 
     esquinaDerAbajo() {

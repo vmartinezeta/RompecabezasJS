@@ -1,5 +1,5 @@
 import { EventBus } from '../EventBus'
-import Phaser, { Scene } from 'phaser'
+import { Scene } from 'phaser'
 import Tablero from '../sprites/Tablero'
 
 export class Game extends Scene {
@@ -40,8 +40,8 @@ export class Game extends Scene {
                 pivote: 40,
                 pieceWidth: 160,
                 pieceHeight: 214,
-                top: false,
-                left: false
+                left: false,
+                bottom: false
             },
             "pieza_5": {
                 pivote: 40,
@@ -76,13 +76,12 @@ export class Game extends Scene {
         }
 
         new Tablero(this, piezas, {
-            x: 0,
-            y: 0,
+            x: 50,
+            y: 50,
             rows: 2,
             cols: 4,
             gap: 100
         })
-
 
         this.keyboard = this.input.keyboard.createCursorKeys()
 
