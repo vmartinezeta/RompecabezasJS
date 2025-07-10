@@ -1,17 +1,18 @@
 import Phaser from "phaser"
-import PiezaTablero from "./PiezaTablero"
+import Pieza from "./Pieza"
 
 export default class Tablero extends Phaser.GameObjects.Group {
     constructor(scene, piezas, config) {
         super(scene)
         this.scene = scene
-        this.scene.physics.add.existing(this, true)
         this.crearTablero(piezas, config)
+        this.scene.physics.add.existing(this, true)
     }
 
     crearTablero(piezas, config) {
         const { gap, x, y, rows, cols } = config
         const array = Object.entries(piezas)
+
         for (let i = 0; i < rows; i++) {
             for (let j = 0; j < cols; j++) {
                 const x0 = gap * j + x
@@ -19,15 +20,17 @@ export default class Tablero extends Phaser.GameObjects.Group {
                 const idx = cols * i + j
                 if (idx > array.length - 1) break
                 const [imageKey, options] = array[idx]
-
-                const pieza = new PiezaTablero(
+                const pieza = new Pieza(
                     this.scene,
-                    imageKey,
-                    new Phaser.Geom.Point(x0, y0),
-                    options
-                )
+                    {
+                        ...options,
+                        imageKey,
+                        x:x0,
+                        y:y0 
+                    })
+
                 this.add(pieza)
-                this.enableGroupDrag(pieza)
+                // this.enableGroupDrag(pieza)
             }
         }
     }

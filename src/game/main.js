@@ -9,10 +9,10 @@ import { HowTo } from './scenes/HowTo'
 // https://newdocs.phaser.io/docs/3.70.0/Phaser.Types.Core.GameConfig
 const config = {
     type: Phaser.AUTO,
-    width: 800,
-    height: 600,
+    width: 1160,
+    height: 560,
     parent: 'game-container',
-    backgroundColor: '#028af8',
+    backgroundColor: '#ffffff',
     physics: {
         default: 'arcade',
         arcade: {

@@ -2,8 +2,9 @@ import { useRef, useState } from 'react'
 import { PhaserGame } from './game/PhaserGame'
 import "./estilos.css"
 
+
 function App() {
-    const phaserRef = useRef();
+    const phaserRef = useRef()
     const [text, setText] = useState("")
 
     const changeScene = () => {
@@ -15,20 +16,22 @@ function App() {
 
     const currentScene = scene => {
         if (scene.scene.key === "MainMenu") {
-            setText("Menu Principal")
+            setText("Menu principal")
         } else if (scene.scene.key === "Game") {
             setText("Juego")
         }
     }
 
-    return <div id="app">
-        <div className="centro">
-            <h1>{text}</h1>
-            <PhaserGame ref={phaserRef} currentActiveScene={currentScene} />
-        </div>
-        <div>
-            <div>
-                <button disabled={false} className="button" onClick={changeScene} >Play</button>
+    return <div className="app">
+        <h1 className="pagina__titulo">{text}</h1>
+        <div className="columna">
+            <div className="columna__izquierda">
+                <PhaserGame ref={phaserRef} currentActiveScene={currentScene} />
+            </div>
+            <div className="columna__derecha">
+                <div className="centroControl">
+                    <button disabled={false} className="button" onClick={changeScene} >Play</button>
+                </div>
             </div>
         </div>
     </div>

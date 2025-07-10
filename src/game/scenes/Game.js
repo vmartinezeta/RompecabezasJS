@@ -2,6 +2,7 @@ import { EventBus } from '../EventBus'
 import { Scene } from 'phaser'
 import Tablero from '../sprites/Tablero'
 
+
 export class Game extends Scene {
     constructor() {
         super('Game')
@@ -14,78 +15,96 @@ export class Game extends Scene {
 
         const piezas = {
             "pieza_1": {
+                deltaX: 0,
+                deltaY: 0,
+                pieceWidth: 160,
+                pieceHeight: 214,
                 pivote: 40,
-                pieceWidth: 200,
-                pieceHeight: 254,
                 right: true,
                 bottom: true
             },
             "pieza_2": {
-                pivote: 40,
+                deltaX: 0,
+                deltaY: 0,
                 pieceWidth: 160,
                 pieceHeight: 214,
-                right:false,
+                pivote: 40,
+                right: false,
                 bottom: false,
                 left: false
             },
             "pieza_3": {
+                deltaX: 40,
+                deltaY: 0,
+                pieceWidth: 160,
+                pieceHeight: 214,
                 pivote: 40,
-                pieceWidth: 240,
-                pieceHeight: 254,
-                right:true,
+                right: true,
                 bottom: true,
                 left: true
             },
             "pieza_4": {
-                pivote: 40,
+                deltaX: 0,
+                deltaY: 0,
                 pieceWidth: 160,
                 pieceHeight: 214,
+                pivote: 40,
                 left: false,
                 bottom: false
             },
             "pieza_5": {
-                pivote: 40,
+                deltaX: 0,
+                deltaY: 0,
                 pieceWidth: 160,
                 pieceHeight: 214,
+                pivote: 40,
                 top: false,
                 right: false
             },
             "pieza_6": {
+                deltaX: 40,
+                deltaY: 40,
+                pieceWidth: 160,
+                pieceHeight: 214,
                 pivote: 40,
-                pieceWidth: 240,
-                pieceHeight: 254,
                 top: true,
                 right: true,
                 left: true
             },
             "pieza_7": {
-                pivote: 40,
+                deltaX: 0,
+                deltaY: 0,
                 pieceWidth: 160,
                 pieceHeight: 214,
+                pivote: 40,
                 top: false,
                 right: false,
                 left: false
             },
             "pieza_8": {
+                deltaX: 40,
+                deltaY: 40,
+                pieceWidth: 160,
+                pieceHeight: 214,
                 pivote: 40,
-                pieceWidth: 200,
-                pieceHeight: 254,
                 top: true,
                 left: true
             }
         }
 
         new Tablero(this, piezas, {
-            x: 50,
-            y: 50,
+            x: 20,
+            y: 20,
             rows: 2,
             cols: 4,
-            gap: 100
+            gap: 260
         })
+
+
 
         this.keyboard = this.input.keyboard.createCursorKeys()
 
-        EventBus.emit('current-scene-ready', this);
+        EventBus.emit('current-scene-ready', this)
     }
 
     changeScene() {

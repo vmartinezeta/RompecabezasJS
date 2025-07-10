@@ -4,33 +4,24 @@
     box-sizing: border-box;
 }
 
-.centro {
+.columna {
+    display: flex;
+    padding: 10px;
+}
+
+.columna__izquierda {
     position: relative;
 }
 
-.caja {    
-    position: absolute;    
-    width: 40px;
-    height: 50px;    
-    background-color: tomato;
+.columna__derecha {
+    min-height: 100%;
+    width: 200px;
     display: flex;
-    animation: comer 1 1s;
+    justify-content: center;
+    align-items: center;
 }
 
-.titulo {
-    text-align: center;
-    background: #000;
-    font-weight: 600;    
-    width: 100%;
-    height: 100%;
-}
-
-@keyframes comer {
-    to {
-        top: 160px;
-        width: 0;
-        height: 0;
-        opacity: 0;
-        transform: translateX(45px);
-    }
+.pagina__titulo {
+    color: #fff;
+    margin: 10px;
 }
