@@ -1,11 +1,14 @@
 import Phaser from "phaser"
 import Pieza from "./Pieza"
+import { Punto } from "../classes/Punto"
 
 export default class Tablero extends Phaser.GameObjects.Group {
     constructor(scene, piezas, config) {
         super(scene)
         this.scene = scene
+        this.config = config
         this.crearTablero(piezas, config)
+        this.desordenar(new Punto(100,60), 150)
         this.scene.physics.add.existing(this, true)
     }
 
@@ -25,27 +28,46 @@ export default class Tablero extends Phaser.GameObjects.Group {
                     {
                         ...options,
                         imageKey,
-                        x:x0,
-                        y:y0 
+                        x: x0,
+                        y: y0
                     })
 
                 this.add(pieza)
-                // this.enableGroupDrag(pieza)
             }
         }
     }
 
-    enableGroupDrag(group) {
-        // Habilitar interacción para todos los hijos del grupo
-        group.setInteractive(new Phaser.Geom.Rectangle(group.origen.x, group.origen.y, 200, 200), Phaser.Geom.Rectangle.Contains)
-        // group.setSize(200, 200)
-        // group.setInteractive()
-        this.scene.input.setDraggable(group)
+    desordenar(origen, radio) {
+        const THETA_EN_RADIANES = 2 * Math.PI
+        let cantidadPuntos = this.config.rows* this.config.cols 
+        const sectorCircular = []
+        while (cantidadPuntos) {
+            const theta = Math.random() * THETA_EN_RADIANES
+            const r = Math.random() * radio
+            const x = Math.ceil(r * Math.cos(theta)) + origen.x
+            const y = Math.ceil(r * Math.sin(theta)) + origen.y
 
-        this.scene.input.on('drag', (pointer, gameObject, dragX, dragY) => {
-            gameObject.x = dragX;
-            gameObject.y = dragY;
-        });
+            const punto = new Punto(x, y)
+            if (!this.existe(punto, sectorCircular)) {
+                sectorCircular.push(punto)
+                cantidadPuntos--
+            }
+        }
+
+
+        for (let i=0; i<this.config.rows; i++) {
+            for(let j=0; j<this.config.cols; j++) {
+                 const children = this.getChildren()
+                 const sprite = children[this.config.cols*i+j]
+                 const {x, y} = sectorCircular[this.config.cols*i+j]
+                 sprite.x = x
+                 sprite.y = y
+            }
+        }
+    }
+
+    existe(origen, sector) {
+        return sector.map(c=> c.toString()).includes(origen.toString())
     }
 
 }

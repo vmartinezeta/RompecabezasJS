@@ -97,9 +97,8 @@ export class Game extends Scene {
             y: 20,
             rows: 2,
             cols: 4,
-            gap: 260
+            gap: 200
         })
-
 
 
         this.keyboard = this.input.keyboard.createCursorKeys()

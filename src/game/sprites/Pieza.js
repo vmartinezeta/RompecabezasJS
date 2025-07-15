@@ -6,13 +6,27 @@ export default class Pieza extends Phaser.GameObjects.Container {
         super(scene)
         this.scene = scene
         this.config = config
-
         if (this.getPosition().some(property => config[property])) {
             this.compuesta()
         } else {
-            this.add(new PiezaBase(scene, config))
+            const base = new PiezaBase(scene, config)
+            this.add(base)
+            this.enableGroupDrag(base)
         }
         scene.add.existing(this)
+    }
+
+
+    enableGroupDrag(group) {
+        const {x, y} = group.config
+        group.setInteractive(new Phaser.Geom.Rectangle(x, y, 200, 200), Phaser.Geom.Rectangle.Contains)
+
+        this.scene.input.setDraggable(group)
+
+        this.scene.input.on('drag', (pointer, gameObject, dragX, dragY) => {
+            gameObject.x = dragX;
+            gameObject.y = dragY;
+        });
     }
 
     compuesta() {
@@ -20,8 +34,9 @@ export default class Pieza extends Phaser.GameObjects.Container {
         for (const p of this.getPosition().filter(p => config[p])) {
             delete config[p]
         }
-        
-        this.add(new PiezaBase(this.scene, config))
+
+        const base = this.add(new PiezaBase(this.scene, config))
+        this.enableGroupDrag(base)
 
         const { pivote, pieceWidth, pieceHeight, deltaX, deltaY } = this.config
         if (this.config["top"]) {
