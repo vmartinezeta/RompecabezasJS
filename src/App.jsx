@@ -5,20 +5,27 @@ import "./estilos.css"
 
 function App() {
     const phaserRef = useRef()
+    const [scene, setScene] = useState(null)
     const [text, setText] = useState("")
 
     const changeScene = () => {
-        const scene = phaserRef.current.scene
-        if (scene) {
-            scene.changeScene()
-        }
+        if (!scene) return
+        scene.changeScene()
     }
 
     const currentScene = scene => {
+        setScene(scene)
         if (scene.scene.key === "MainMenu") {
             setText("Menu principal")
         } else if (scene.scene.key === "Game") {
             setText("Juego")
+        }
+    }
+
+
+    const verImagen = () => {
+        if (scene && scene.scene.key === "Game") {
+            scene.verImagen()
         }
     }
 
@@ -31,6 +38,7 @@ function App() {
             <div className="columna__derecha">
                 <div className="centroControl">
                     <button disabled={false} className="button" onClick={changeScene} >Play</button>
+                    {scene.scene.key==="Game" && <button disabled={false} className="button" onClick={verImagen} >Ver original</button>}
                 </div>
             </div>
         </div>

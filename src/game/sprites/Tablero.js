@@ -7,6 +7,7 @@ export default class Tablero extends Phaser.GameObjects.Group {
         super(scene)
         this.scene = scene
         this.config = config
+        this.piezas = []
         this.crearTablero(piezas, config)
         this.desordenar(new Punto(100,60), 150)
         this.scene.physics.add.existing(this, true)
@@ -17,29 +18,84 @@ export default class Tablero extends Phaser.GameObjects.Group {
         const array = Object.entries(piezas)
 
         for (let i = 0; i < rows; i++) {
+            const l = []
             for (let j = 0; j < cols; j++) {
-                const x0 = gap * j + x
-                const y0 = gap * i + y
                 const idx = cols * i + j
                 if (idx > array.length - 1) break
                 const [imageKey, options] = array[idx]
+                const x0 = gap * j + x
+                const y0 = gap * i + y
+
                 const pieza = new Pieza(
                     this.scene,
                     {
                         ...options,
                         imageKey,
+                        row: i,
+                        col: j,
                         x: x0,
                         y: y0
                     })
 
                 this.add(pieza)
+                l.push(pieza)
+            }
+            this.piezas.push(l)
+        }
+    }
+
+    mostrar() {
+        let anterior = null
+        const origen = new Punto(100, 0)
+        for (let i = 0; i < this.config.rows; i++) {
+            for (let j = 0; j < this.config.cols; j++) {
+                const child = this.piezas[i][j]
+                if (anterior) {
+                    this.horizontal(anterior, child, j)
+                } else {
+                    child.x = origen.x
+                    child.y = origen.y
+                    if (i >0) {
+                        const pieza = this.piezas[i-1][0]
+                        if ("bottom" in pieza.config && !pieza.config.bottom) {
+                            
+                        } else if ("bottom" in pieza.config && pieza.config.bottom) {
+                            child.y =origen.y+  2*pieza.config.pivote
+                        }
+                    }
+                }
+
+                if (this.config.cols-1===j ) {
+                    anterior = null
+                } else {                    
+                    anterior = child
+                }
             }
         }
     }
 
+    redibujar() {
+        this.desordenar(new Punto(100,60), 150)
+    }
+
+    horizontal(anterior, child) {
+        if ("right" in anterior.config && !anterior.config.right) {
+            child.x = anterior.x - anterior.config.pivote
+        } if ("right" in anterior.config && anterior.config.right) {
+            child.x = anterior.x + anterior.config.pivote
+            if ("left" in anterior.config && anterior.config.left && "left" in child.config && !child.config.left) {
+                child.x = anterior.x + 2 * anterior.config.pivote
+            }
+        } else {
+            child.x = anterior.x
+        }
+        
+        child.y = anterior.y
+    }
+
     desordenar(origen, radio) {
         const THETA_EN_RADIANES = 2 * Math.PI
-        let cantidadPuntos = this.config.rows* this.config.cols 
+        let cantidadPuntos = this.config.rows * this.config.cols
         const sectorCircular = []
         while (cantidadPuntos) {
             const theta = Math.random() * THETA_EN_RADIANES
@@ -55,19 +111,19 @@ export default class Tablero extends Phaser.GameObjects.Group {
         }
 
 
-        for (let i=0; i<this.config.rows; i++) {
-            for(let j=0; j<this.config.cols; j++) {
-                 const children = this.getChildren()
-                 const sprite = children[this.config.cols*i+j]
-                 const {x, y} = sectorCircular[this.config.cols*i+j]
-                 sprite.x = x
-                 sprite.y = y
+        for (let i = 0; i < this.config.rows; i++) {
+            for (let j = 0; j < this.config.cols; j++) {
+                const children = this.getChildren()
+                const sprite = children[this.config.cols * i + j]
+                const { x, y } = sectorCircular[this.config.cols * i + j]
+                sprite.x = x
+                sprite.y = y
             }
         }
     }
 
     existe(origen, sector) {
-        return sector.map(c=> c.toString()).includes(origen.toString())
+        return sector.map(c => c.toString()).includes(origen.toString())
     }
 
 }

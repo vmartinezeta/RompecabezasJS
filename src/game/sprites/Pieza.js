@@ -1,21 +1,24 @@
 import Phaser from "phaser"
 import PiezaBase from "./PiezaBase"
+import { Punto } from "../classes/Punto";
 
 export default class Pieza extends Phaser.GameObjects.Container {
     constructor(scene, config) {
-        super(scene)
-        this.scene = scene
-        this.config = config
-        if (this.getPosition().some(property => config[property])) {
-            this.compuesta()
-        } else {
-            const base = new PiezaBase(scene, config)
-            this.add(base)
-            this.enableGroupDrag(base)
-        }
-        scene.add.existing(this)
-    }
+        super(scene);
+        this.scene = scene;
+        this.config = config;
+        const {row, col} = config;
+        this.origen = new Punto(row, col);
 
+        if (this.getPosition().some(property => config[property])) {
+            this.compuesta();
+        } else {
+            const base = new PiezaBase(scene, config);
+            this.add(base);
+            this.enableGroupDrag(base);
+        }
+        scene.add.existing(this);
+    }
 
     enableGroupDrag(group) {
         const {x, y} = group.config
@@ -72,5 +75,31 @@ export default class Pieza extends Phaser.GameObjects.Container {
         sprite.setCrop(x, y, width, height)
         this.add(sprite)
         return sprite
+    }
+
+    siguiente(origen, vector) {
+        return new Punto(origen.x + vector.x, origen.y+vector.y)
+    }
+
+    isValido(punto) {
+        return punto.x>=0 && punto.x<this.config.col
+        && punto.y>=0 && punto.y<this.config.y
+    }
+
+    getExtensiones() {
+        const vectores = [
+            new Punto(-1, 0),
+            new Punto(0, 1),
+            new Punto(1, 0),
+            new Punto(0, -1)
+        ]
+        const puntos = []
+        for(const vector of vectores) {
+            const punto = this.siguiente(this.origen, vector)
+            if (this.isValido(punto)) {
+                puntos.push(punto)
+            }
+        }
+        return puntos
     }
 }

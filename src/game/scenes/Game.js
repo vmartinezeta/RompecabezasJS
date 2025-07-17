@@ -6,6 +6,8 @@ import Tablero from '../sprites/Tablero'
 export class Game extends Scene {
     constructor() {
         super('Game')
+        this.tablero = null
+        this.toggle = false
     }
 
     create() {
@@ -92,18 +94,37 @@ export class Game extends Scene {
             }
         }
 
-        new Tablero(this, piezas, {
+        this.tablero = new Tablero(this, piezas, {
             x: 20,
             y: 20,
             rows: 2,
             cols: 4,
-            gap: 200
+            gap: 160
         })
 
+        this.physics.add.collider(this.tablero, this.tablero, this.encajando, this.encajar, this)
 
         this.keyboard = this.input.keyboard.createCursorKeys()
 
         EventBus.emit('current-scene-ready', this)
+    }
+
+
+    verImagen() {
+        this.toggle = !this.toggle        
+        if (this.toggle) {
+            this.tablero.mostrar()
+        } else {
+            this.tablero.redibujar()
+        }
+    }
+
+    encajar(izq, der){
+        return izq.toString() === der.toString()
+    }
+
+    encajando() {
+        console.log("works...")
     }
 
     changeScene() {
