@@ -7,28 +7,44 @@ export default class Pieza extends Phaser.GameObjects.Container {
         super(scene);
         this.scene = scene;
         this.config = config;
-        const {row, col} = config;
+        this.movible = false;
+        this.vectores = [
+            new Punto(-1, 0),
+            new Punto(0, 1),
+            new Punto(1, 0),
+            new Punto(0, -1)
+        ];
+        const { row, col } = config;
         this.origen = new Punto(row, col);
 
         if (this.getPosition().some(property => config[property])) {
             this.compuesta();
         } else {
-            const base = new PiezaBase(scene, config);
-            this.add(base);
+            const base = this.add(new PiezaBase(scene, config));
             this.enableGroupDrag(base);
         }
+        this.setSize(200, 200);
+        scene.physics.world.enable(this);
+        this.body.setOffset(this.config.x + this.config.pieceWidth / 2, this.config.y + this.config.pieceHeight / 2);
         scene.add.existing(this);
     }
 
     enableGroupDrag(group) {
-        const {x, y} = group.config
-        group.setInteractive(new Phaser.Geom.Rectangle(x, y, 200, 200), Phaser.Geom.Rectangle.Contains)
+        const { x, y } = group.config
+        group.setInteractive(new Phaser.Geom.Rectangle(x+100, y+100, 200, 200), Phaser.Geom.Rectangle.Contains)
 
         this.scene.input.setDraggable(group)
+        this.scene.input.on('dragstart', (pointer, gameObject) => {
+            gameObject.movible = true
+        });
 
         this.scene.input.on('drag', (pointer, gameObject, dragX, dragY) => {
             gameObject.x = dragX;
             gameObject.y = dragY;
+        });
+
+        this.scene.input.on('dragend', (pointer, gameObject) => {
+            gameObject.movible = false
         });
     }
 
@@ -78,28 +94,22 @@ export default class Pieza extends Phaser.GameObjects.Container {
     }
 
     siguiente(origen, vector) {
-        return new Punto(origen.x + vector.x, origen.y+vector.y)
+        return new Punto(origen.x + vector.x, origen.y + vector.y)
     }
 
     isValido(punto) {
-        return punto.x>=0 && punto.x<this.config.col
-        && punto.y>=0 && punto.y<this.config.y
+        return punto.x >= 0 && punto.x < this.config.rows
+            && punto.y >= 0 && punto.y < this.config.cols
     }
 
     getExtensiones() {
-        const vectores = [
-            new Punto(-1, 0),
-            new Punto(0, 1),
-            new Punto(1, 0),
-            new Punto(0, -1)
-        ]
-        const puntos = []
-        for(const vector of vectores) {
+        const vectores = []
+        for (const vector of this.vectores) {
             const punto = this.siguiente(this.origen, vector)
             if (this.isValido(punto)) {
-                puntos.push(punto)
+                vectores.push(vector)
             }
         }
-        return puntos
+        return vectores
     }
 }

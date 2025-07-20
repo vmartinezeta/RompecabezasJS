@@ -1,12 +1,17 @@
 import Phaser from "phaser"
 
-export class PiezaEncajadas extends Phaser.GameObjects.Container{
+export class TableroMovible extends Phaser.GameObjects.Group{
     constructor(scene) {
         super(scene)
+        scene.physics.add.existing(this, true)
     }
 
-    add(pieza){
+    agregar(pieza) {
         this.add(pieza)
+    }
+
+    vacio() {
+        return this.countActive() === 0
     }
 
     existe(origen) {

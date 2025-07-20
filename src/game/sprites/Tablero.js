@@ -9,7 +9,7 @@ export default class Tablero extends Phaser.GameObjects.Group {
         this.config = config
         this.piezas = []
         this.crearTablero(piezas, config)
-        this.desordenar(new Punto(100,60), 150)
+        this.desordenar(new Punto(100, 100), 150)
         this.scene.physics.add.existing(this, true)
     }
 
@@ -31,6 +31,8 @@ export default class Tablero extends Phaser.GameObjects.Group {
                     {
                         ...options,
                         imageKey,
+                        rows,
+                        cols,
                         row: i,
                         col: j,
                         x: x0,
@@ -51,34 +53,34 @@ export default class Tablero extends Phaser.GameObjects.Group {
             for (let j = 0; j < this.config.cols; j++) {
                 const child = this.piezas[i][j]
                 if (anterior) {
-                    this.horizontal(anterior, child, j)
+                    this.horizontal(anterior, child, i)
                 } else {
-                    child.x = origen.x
-                    child.y = origen.y
-                    if (i >0) {
-                        const pieza = this.piezas[i-1][0]
-                        if ("bottom" in pieza.config && !pieza.config.bottom) {
-                            
-                        } else if ("bottom" in pieza.config && pieza.config.bottom) {
-                            child.y =origen.y+  2*pieza.config.pivote
-                        }
+                    const primera= this.piezas[0][0]
+                    if (i>0) {
+                        origen.y = i*primera.config.pieceHeight-100
                     }
+                    this.posicionar(child, origen)
                 }
 
-                if (this.config.cols-1===j ) {
+                if (this.config.cols - 1 === j) {
                     anterior = null
-                } else {                    
+                } else {
                     anterior = child
                 }
             }
         }
     }
 
-    redibujar() {
-        this.desordenar(new Punto(100,60), 150)
+    posicionar(child, origen) {
+        child.x = origen.x
+        child.y = origen.y
     }
 
-    horizontal(anterior, child) {
+    redibujar() {
+        this.desordenar(new Punto(100, 60), 150)
+    }
+
+    horizontal(anterior, child, fila) {
         if ("right" in anterior.config && !anterior.config.right) {
             child.x = anterior.x - anterior.config.pivote
         } if ("right" in anterior.config && anterior.config.right) {
@@ -89,8 +91,13 @@ export default class Tablero extends Phaser.GameObjects.Group {
         } else {
             child.x = anterior.x
         }
-        
+
         child.y = anterior.y
+        if (fila > 0 && ("top" in child.config && child.config.top)) {
+            child.y -= child.config.pivote
+        } else if (fila > 0 && ("top" in child.config && !child.config.top)){
+            child.y += child.config.pivote
+        }
     }
 
     desordenar(origen, radio) {

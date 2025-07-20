@@ -3,14 +3,13 @@ import { Game } from './scenes/Game'
 import { MainMenu } from './scenes/MainMenu'
 import Phaser from 'phaser'
 import { Preloader } from './scenes/Preloader'
-import { HowTo } from './scenes/HowTo'
 
 // Find out more information about the Game Config at:
 // https://newdocs.phaser.io/docs/3.70.0/Phaser.Types.Core.GameConfig
 const config = {
     type: Phaser.AUTO,
-    width: 1160,
-    height: 560,
+    width: 900,
+    height: 600,
     parent: 'game-container',
     backgroundColor: '#ffffff',
     physics: {
@@ -24,8 +23,7 @@ const config = {
         Boot,
         Preloader,
         MainMenu,
-        Game,
-        HowTo
+        Game
     ]
 };
 
