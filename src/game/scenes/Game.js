@@ -3,12 +3,14 @@ import { Scene } from 'phaser'
 import Tablero from '../sprites/Tablero'
 import { TableroMovible } from '../sprites/TableroMovible'
 import { Punto } from '../classes/Punto'
+import VistaPrevia from '../sprites/VistaPrevia'
 
 
 export class Game extends Scene {
     constructor() {
         super('Game')
         this.tablero = null
+        this.vistaPrevia = null
         this.toggle = false
     }
 
@@ -96,13 +98,16 @@ export class Game extends Scene {
             }
         }
 
-        this.tablero = new Tablero(this, piezas, {
+        const config = {
             x: 20,
             y: 20,
             rows: 2,
             cols: 4,
             gap: 160
-        })
+        }
+        this.tablero = new Tablero(this, piezas, config)
+
+        this.vistaPrevia = new VistaPrevia(this, piezas, config)
 
         this.tableroMovible = new TableroMovible(this)
 
@@ -117,8 +122,10 @@ export class Game extends Scene {
     verImagen() {
         this.toggle = !this.toggle
         if (this.toggle) {
-            this.tablero.mostrar()
+            this.tablero.borrar()
+            this.vistaPrevia.redibujar()
         } else {
+            this.vistaPrevia.borrar()
             this.tablero.redibujar()
         }
     }
@@ -135,26 +142,25 @@ export class Game extends Scene {
         const [estatica, movible] = this.clasificarPiezas(izq, der)
         const [vector, opuesto] = this.empatar(estatica, movible)
 
-        this.eliminarVector(estatica, vector)
-        this.eliminarVector(movible, opuesto)
+        movible.eliminarVector(opuesto)
         if (this.tableroMovible.vacio()) {
-            this.moverParejaTableroMovible(movible, estatica)
+            // this.moverParejaTableroMovible(movible, estatica)
         } else {
-            this.moverPiezaTableroMovible(movible)
+            // this.moverPiezaTableroMovible(movible)
         }
 
+        estatica.direccional.setVector(vector)
         estatica.movible = false
         movible.movible = false
 
-        // posicionar las piezas depende del vector
-        if (vector.isIgual(-1, 0)) {
-            // top
-        } else if (vector.isIgual(0, 1)) {
-            // right
-        } else if (vector.isIgual(1, 0)) {
-            // bottom
-        } else if (vector.isIgual(0, -1)) {
-            // left
+        if (estatica.top()) {
+            estatica.eliminarVector(vector)
+        } else if (estatica.right()) {
+            estatica.eliminarVector(vector)
+        } else if (estatica.bottom()) {
+            estatica.eliminarVector(vector)
+        } else if (estatica.left()) {
+            estatica.eliminarVector(vector)
         }
     }
 
@@ -175,14 +181,8 @@ export class Game extends Scene {
 
     moverPiezaTableroMovible(sprite) {
         this.input.setDraggable(sprite, false)
-        this.tablero.remove(sprite, false, false)
         this.tableroMovible.agregar(sprite)
-    }
-
-    eliminarVector(pieza, vector) {
-        const idx = pieza.vectores.findIndex(v => v.toString() === vector.toString())
-        if (idx < 0) return
-        pieza.vectores.splice(idx, 1)
+        this.tablero.remove(sprite, false, false)
     }
 
     empato(izq, v1, der, v2) {
@@ -197,8 +197,8 @@ export class Game extends Scene {
     }
 
     empatar(izq, der) {
-        for (const v1 of izq.getExtensiones()) {
-            for (const v2 of der.getExtensiones()) {
+        for (const v1 of izq.getVectores()) {
+            for (const v2 of der.getVectores()) {
                 if (this.vectorNulo(v1, v2) && this.empato(izq.origen, v1, der.origen, v2)) {
                     return [v1, v2];
                 }
@@ -212,6 +212,9 @@ export class Game extends Scene {
     }
 
     changeScene() {
+        this.toggle = false
+        this.tablero = null
+        this.vistaPrevia = null        
         this.scene.start("MainMenu")
     }
 

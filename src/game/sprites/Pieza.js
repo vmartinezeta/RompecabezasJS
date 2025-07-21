@@ -1,6 +1,7 @@
 import Phaser from "phaser"
 import PiezaBase from "./PiezaBase"
 import { Punto } from "../classes/Punto";
+import { PiezaDireccional } from "../classes/PiezaDireccional";
 
 export default class Pieza extends Phaser.GameObjects.Container {
     constructor(scene, config) {
@@ -8,14 +9,15 @@ export default class Pieza extends Phaser.GameObjects.Container {
         this.scene = scene;
         this.config = config;
         this.movible = false;
-        this.vectores = [
+        const { row, col } = config;
+        this.origen = new Punto(row, col);     
+        this.direccional = new PiezaDireccional([
             new Punto(-1, 0),
             new Punto(0, 1),
             new Punto(1, 0),
             new Punto(0, -1)
-        ];
-        const { row, col } = config;
-        this.origen = new Punto(row, col);
+        ]);
+        this.crearDireccionales();
 
         if (this.getPosition().some(property => config[property])) {
             this.compuesta();
@@ -31,7 +33,7 @@ export default class Pieza extends Phaser.GameObjects.Container {
 
     enableGroupDrag(group) {
         const { x, y } = group.config
-        group.setInteractive(new Phaser.Geom.Rectangle(x+100, y+100, 200, 200), Phaser.Geom.Rectangle.Contains)
+        group.setInteractive(new Phaser.Geom.Rectangle(x + 100, y + 100, 200, 200), Phaser.Geom.Rectangle.Contains)
 
         this.scene.input.setDraggable(group)
         this.scene.input.on('dragstart', (pointer, gameObject) => {
@@ -102,14 +104,36 @@ export default class Pieza extends Phaser.GameObjects.Container {
             && punto.y >= 0 && punto.y < this.config.cols
     }
 
-    getExtensiones() {
-        const vectores = []
-        for (const vector of this.vectores) {
+    crearDireccionales() {
+        for (const vector of this.getVectores()) {
             const punto = this.siguiente(this.origen, vector)
-            if (this.isValido(punto)) {
-                vectores.push(vector)
+            if (!this.isValido(punto)) {
+                this.direccional.eliminar(vector)
             }
         }
-        return vectores
+    }
+
+    getVectores() {
+        return this.direccional.vectores
+    }
+
+    top() {
+        return this.direccional.top()
+    }
+
+    right() {
+        return this.direccional.right()
+    }
+
+    bottom() {
+        return this.direccional.bottom()
+    }
+
+    left() {
+        return this.direccional.left()
+    }
+
+    eliminarVector(vector) {
+        this.direccional.eliminar(vector)
     }
 }
