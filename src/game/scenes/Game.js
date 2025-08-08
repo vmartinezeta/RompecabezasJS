@@ -1,28 +1,27 @@
 import { EventBus } from '../EventBus'
 import { Scene } from 'phaser'
-import Tablero from '../sprites/Tablero'
 import { TableroMovible } from '../sprites/TableroMovible'
 import { Punto } from '../classes/Punto'
+import Pieza from '../sprites/Pieza'
+import Tablero from '../sprites/Tablero'
 import VistaPrevia from '../sprites/VistaPrevia'
 
 
 export class Game extends Scene {
     constructor() {
         super('Game')
-        this.tablero = null
-        this.vistaPrevia = null
-        this.toggle = false
+        this.tablero = null;
+        this.vistaPrevia = null;
+        this.tableroMovible = null;
+        this.toggle = false;
     }
 
     create() {
-        this.physics.world.setBounds(0, 0, 1024, 600)
-
-        this.input.mouse.disableContextMenu()
+        this.physics.world.setBounds(0, 0, 1024, 600);
+        this.input.mouse.disableContextMenu();
 
         const piezas = {
             "pieza_1": {
-                deltaX: 0,
-                deltaY: 0,
                 pieceWidth: 160,
                 pieceHeight: 214,
                 pivote: 40,
@@ -30,8 +29,6 @@ export class Game extends Scene {
                 bottom: true
             },
             "pieza_2": {
-                deltaX: 0,
-                deltaY: 0,
                 pieceWidth: 160,
                 pieceHeight: 214,
                 pivote: 40,
@@ -40,8 +37,6 @@ export class Game extends Scene {
                 left: false
             },
             "pieza_3": {
-                deltaX: 40,
-                deltaY: 0,
                 pieceWidth: 160,
                 pieceHeight: 214,
                 pivote: 40,
@@ -50,8 +45,6 @@ export class Game extends Scene {
                 left: true
             },
             "pieza_4": {
-                deltaX: 0,
-                deltaY: 0,
                 pieceWidth: 160,
                 pieceHeight: 214,
                 pivote: 40,
@@ -59,8 +52,6 @@ export class Game extends Scene {
                 bottom: false
             },
             "pieza_5": {
-                deltaX: 0,
-                deltaY: 0,
                 pieceWidth: 160,
                 pieceHeight: 214,
                 pivote: 40,
@@ -68,8 +59,6 @@ export class Game extends Scene {
                 right: false
             },
             "pieza_6": {
-                deltaX: 40,
-                deltaY: 40,
                 pieceWidth: 160,
                 pieceHeight: 214,
                 pivote: 40,
@@ -78,8 +67,6 @@ export class Game extends Scene {
                 left: true
             },
             "pieza_7": {
-                deltaX: 0,
-                deltaY: 0,
                 pieceWidth: 160,
                 pieceHeight: 214,
                 pivote: 40,
@@ -88,123 +75,174 @@ export class Game extends Scene {
                 left: false
             },
             "pieza_8": {
-                deltaX: 40,
-                deltaY: 40,
                 pieceWidth: 160,
                 pieceHeight: 214,
                 pivote: 40,
                 top: true,
                 left: true
             }
-        }
+        };
 
         const config = {
-            x: 20,
-            y: 20,
+            x: 100,
+            y: 60,
             rows: 2,
             cols: 4,
-            gap: 160
-        }
-        this.tablero = new Tablero(this, piezas, config)
+            gap: 150
+        };
 
-        this.vistaPrevia = new VistaPrevia(this, piezas, config)
+        this.tablero = new Tablero(this, piezas, config);
 
-        this.tableroMovible = new TableroMovible(this)
+        this.vistaPrevia = new VistaPrevia(this, piezas, config);
 
-        this.physics.add.collider(this.tablero, this.tablero, this.encajando, this.encajarPrimeraVez, this)
-        this.physics.add.collider(this.tablero, this.tableroMovible, this.encajando, this.seguirEncajando, this)
+        this.tableroMovible = new TableroMovible(this);
 
-        this.keyboard = this.input.keyboard.createCursorKeys()
+        this.physics.add.collider(this.tablero, this.tablero, this.encajando, this.primeraVez, this);
+        this.physics.add.collider(this.tablero, this.tableroMovible, this.encajando, this.seguirEncajando, this);
 
-        EventBus.emit('current-scene-ready', this)
+        EventBus.emit('current-scene-ready', this);
     }
 
     verImagen() {
-        this.toggle = !this.toggle
-        if (this.toggle) {
-            this.tablero.borrar()
-            this.vistaPrevia.redibujar()
-        } else {
-            this.vistaPrevia.borrar()
-            this.tablero.redibujar()
-        }
+        // this.toggle = !this.toggle
+        // if (this.toggle) {
+        //     this.tablero.borrar()
+        //     this.vistaPrevia.redibujar()
+        // } else {
+        //     this.vistaPrevia.borrar()
+        //     this.tablero.redibujar()
+        // }
     }
 
-    encajarPrimeraVez(izq, der) {
-        return (izq.movible || der.movible) && this.empatar(izq, der).length > 0 && this.tableroMovible.vacio()
+    primeraVez(izq, der) {
+        const [estatica, movible] = this.fijarPareja(izq, der);
+        return movible.isMovValido() && this.empatar(estatica, movible).length > 0 && this.tableroMovible.vacio();
     }
 
     seguirEncajando(izq, der) {
-        return (izq.movible || der.movible) && this.empatar(izq, der).length > 0 && !this.tableroMovible.vacio()
+        const [estatica, movible] = this.fijarPareja(izq, der);
+        return movible.isMovValido() && this.empatar(estatica, movible).length > 0 && this.tableroMovible.hayPiezas();
     }
 
     encajando(izq, der) {
-        const [estatica, movible] = this.clasificarPiezas(izq, der)
-        const [vector, opuesto] = this.empatar(estatica, movible)
-
-        movible.eliminarVector(opuesto)
+        const [estatica, movible] = this.fijarPareja(izq, der);
+        movible.finMovimiento();
         if (this.tableroMovible.vacio()) {
-            // this.moverParejaTableroMovible(movible, estatica)
-        } else {
-            // this.moverPiezaTableroMovible(movible)
-        }
-
-        estatica.direccional.setVector(vector)
-        estatica.movible = false
-        movible.movible = false
-
-        if (estatica.top()) {
-            estatica.eliminarVector(vector)
-        } else if (estatica.right()) {
-            estatica.eliminarVector(vector)
-        } else if (estatica.bottom()) {
-            estatica.eliminarVector(vector)
-        } else if (estatica.left()) {
-            estatica.eliminarVector(vector)
+            return this.moverParejaTableroMovible(estatica, movible);
+        } else if (this.tableroMovible.hayPiezas()) {
+            return this.moverPiezaTableroMovible(estatica, movible);
         }
     }
 
-    clasificarPiezas(izq, der) {
-        let estatica = izq
-        let movible = der
-        if (estatica.movible) {
-            estatica = der
-            movible = izq
+    fijarPareja(izq, der) {
+        let estatica = izq;
+        let movible = der;
+        if (estatica.moviendo) {
+            estatica = der;
+            movible = izq;
         }
-        return [estatica, movible]
+        return [estatica, movible];
     }
 
-    moverParejaTableroMovible(izq, der) {
-        this.moverPiezaTableroMovible(izq)
-        this.moverPiezaTableroMovible(der)
+    moverParejaTableroMovible(estatica, movible) {
+        const {x, y} = estatica.actual();
+        const config = {...estatica.config};
+        const fija = new Pieza(this, config);
+        fija.x = x;
+        fija.y = y;
+        this.input.setDraggable(fija, false);
+        this.tableroMovible.add(fija);
+        this.tablero.remove(estatica, true, true);
+        this.moverPiezaTableroMovible(fija, movible);
     }
 
-    moverPiezaTableroMovible(sprite) {
-        this.input.setDraggable(sprite, false)
-        this.tableroMovible.agregar(sprite)
-        this.tablero.remove(sprite, false, false)
+    moverPiezaTableroMovible(estatica, movible) {
+        const pieza = new Pieza(this, {...movible.config});
+        const [vector, opuesto] = this.empatar(estatica, pieza);
+        const direccional = pieza.direccional.newInstance();
+        direccional.setVector(opuesto);
+        pieza.finMovimiento();
+
+        if (direccional.top()) {
+            if (pieza.tienePunta("top")) {
+                pieza.x = estatica.x;
+                pieza.y = estatica.y - 10;
+            } else if (pieza.tieneAgujero("top")) {
+                pieza.x = estatica.x;
+                pieza.y = estatica.y+60;
+            }
+        } else if (direccional.right()) {
+            console.log("right")
+            pieza.y = estatica.y
+            if (estatica.config.right) {
+                pieza.x = estatica.x + pieza.config.pivote
+            } else if (!estatica.config.right) {
+                pieza.x = estatica.x - pieza.config.pivote
+            }
+        } else if (direccional.bottom()) {
+            console.log("bottom")
+            if (estatica.config.left) {
+                pieza.x += estatica.config.pivote
+            } else {
+                pieza.x = estatica.x
+            }
+            if ("top" in estatica.config && estatica.top) {
+                pieza.y = estatica.y + pieza.config.pieceHeight + estatica.config.pivote
+            } else {
+                pieza.y = estatica.y + pieza.config.pieceHeight
+            }
+        } else if (direccional.left()) {
+            if (pieza.tienePunta("left")) {
+                pieza.x = estatica.x - 30;
+                pieza.y = estatica.y;
+
+                if (pieza.tienePunta("top")) {
+                    pieza.y = estatica.y-40;
+                    pieza.x = estatica.x-30;
+                }
+
+            } else if (pieza.tieneAgujero("left")) {
+                if (pieza.tieneAgujero("top")) {
+                    pieza.y = estatica.y+40;
+                    pieza.x = estatica.x+50;
+                } else if (estatica.tienePunta("left") && estatica.tienePunta("right")) {
+                    pieza.y = estatica.y;
+                    pieza.x = estatica.x+50;
+                } else {
+                    pieza.x = estatica.x+10;
+                    pieza.y = estatica.y;
+                }
+            }
+        }
+
+        estatica.eliminarVector(vector);
+        pieza.eliminarVector(opuesto);
+
+        this.tablero.remove(movible, true, true);
+        this.tableroMovible.add(pieza);
+        this.input.setDraggable(pieza, false);
     }
 
     empato(izq, v1, der, v2) {
         const derecha = this.siguiente(izq, v1);
         const izquierda = this.siguiente(der, v2);
-        return der.toString() === derecha.toString()
-            && izq.toString() === izquierda.toString();
+        return izq.toString() === izquierda.toString()
+            && der.toString() === derecha.toString();
     }
 
-    vectorNulo(v1, v2) {
+    puedeAcercarse(v1, v2) {
         return v1.x + v2.x === 0 && v1.y + v2.y === 0
     }
 
     empatar(izq, der) {
         for (const v1 of izq.getVectores()) {
             for (const v2 of der.getVectores()) {
-                if (this.vectorNulo(v1, v2) && this.empato(izq.origen, v1, der.origen, v2)) {
+                if (this.puedeAcercarse(v1, v2) && this.empato(izq.origen, v1, der.origen, v2)) {
                     return [v1, v2];
                 }
             }
         }
-        return []
+        return [];
     }
 
     siguiente(origen, vector) {
@@ -214,7 +252,7 @@ export class Game extends Scene {
     changeScene() {
         this.toggle = false
         this.tablero = null
-        this.vistaPrevia = null        
+        this.vistaPrevia = null
         this.scene.start("MainMenu")
     }
 

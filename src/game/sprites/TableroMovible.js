@@ -1,26 +1,27 @@
 import Phaser from "phaser"
 
-export class TableroMovible extends Phaser.GameObjects.Container{
+export class TableroMovible extends Phaser.GameObjects.Group {
     constructor(scene) {
         super(scene);
-        scene.add.existing(this);
-    }
-
-    agregar(pieza) {
-        this.add(pieza)
+        this.scene = scene;
+        scene.physics.add.existing(this, true);
     }
 
     vacio() {
-        return this.list.length === 0
+        return this.countActive() === 0;
+    }
+
+    hayPiezas() {
+        return this.countActive() > 0;
     }
 
     existe(origen) {
-        return this.list.find(p => p.origen.toString() === origen.toString())
+        return this.getChildren().find(p => p.origen.toString() === origen.toString())
     }
 
     borrar() {
-        for(const p of this.list) {
-            this.remove(p, true)
+        for(const p of this.getChildren()) {
+            this.remove(p, true, true)
         }
     }
 }

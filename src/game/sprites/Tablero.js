@@ -10,7 +10,7 @@ export default class Tablero extends Phaser.GameObjects.Group {
         this.sprites = piezas
         this.piezas = [];
         this.crearTablero();
-        this.desordenar(new Punto(100, 100), 150);
+        // this.desordenar(new Punto(100, 100), 150);
         this.scene.physics.add.existing(this, true);
     }
 
@@ -20,11 +20,11 @@ export default class Tablero extends Phaser.GameObjects.Group {
 
         for (let i = 0; i < rows; i++) {
             for (let j = 0; j < cols; j++) {
-                const idx = cols * i + j
-                if (idx > array.length - 1) break
-                const [imageKey, options] = array[idx]
-                const x0 = gap * j + x
-                const y0 = gap * i + y
+                const idx = cols * i + j;
+                if (idx > array.length - 1) break;
+                const [imageKey, options] = array[idx];
+                const x0 = gap * j + x;
+                const y0 = gap * i + y;
 
                 const pieza = new Pieza(
                     this.scene,
@@ -37,10 +37,10 @@ export default class Tablero extends Phaser.GameObjects.Group {
                         col: j,
                         x: x0,
                         y: y0
-                    })
+                    });
 
-                this.add(pieza)
-                this.piezas.push(pieza)
+                this.add(pieza);
+                this.piezas.push(pieza);
             }
         }
     }
@@ -85,8 +85,9 @@ export default class Tablero extends Phaser.GameObjects.Group {
     }
 
     borrar() {
-        for(const p of this.piezas) {
+        for (const p of this.piezas) {
             this.remove(p, true, true)
         }
     }
+
 }

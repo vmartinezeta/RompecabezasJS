@@ -2,15 +2,15 @@ import Phaser from "phaser"
 
 export default class PiezaBase extends Phaser.GameObjects.Container {
     constructor(scene, config) {
-        super(scene)
-        this.scene = scene
-        this.config = config
-        this.arriba()
-        this.derecha()
-        this.abajo()
-        this.izquierda()
-        this.centro()
-        scene.add.existing(this)
+        super(scene);
+        this.scene = scene;
+        this.config = config;
+        this.arriba();
+        this.derecha();
+        this.abajo();
+        this.izquierda();
+        this.centro();
+        scene.add.existing(this);
     }
 
     existe(property) {
@@ -145,15 +145,15 @@ export default class PiezaBase extends Phaser.GameObjects.Container {
             this.recortar(0, pm, pivote, pm-pivote)
         }
 
-        this.recortar(pivote, pivote, pieceWidth - 2 * pivote, pieceHeight - 2 * pivote)
+        this.recortar(pivote, pivote, pieceWidth - 2 * pivote, pieceHeight - 2 * pivote);
     }
 
     recortar(x, y, width, height) {
-        const {deltaX, deltaY, x:x0, y:y0, imageKey} = this.config
-        const sprite = this.scene.add.sprite(x0, y0, imageKey)
-        sprite.setOrigin(0)
-        sprite.setCrop(deltaX+x, deltaY+y, width, height)
-        this.add(sprite)
-        return sprite
+        const {deltaX, deltaY, x:x0, y:y0, imageKey} = this.config;
+        const sprite = this.scene.add.sprite(x0, y0, imageKey);
+        sprite.setOrigin(0);
+        sprite.setCrop(deltaX+x, deltaY+y, width, height);
+        this.add(sprite);
+        return sprite;
     }    
 }

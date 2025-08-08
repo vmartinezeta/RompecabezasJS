@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
 import { PhaserGame } from './game/PhaserGame'
-import "./estilos.css"
 import { useGame } from './context/GameContext'
+import "./estilos.css"
 
 
 function App() {
