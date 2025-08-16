@@ -4,56 +4,57 @@ import { Punto } from "../classes/Punto";
 
 export default class VistaPrevia extends Phaser.GameObjects.Group {
     constructor(scene, piezas, config) {
-        super(scene)
-        this.scene = scene
-        this.config = config
-        this.sprites = piezas
-        this.piezas = []
-        this.piezaArray = []
-        this.scene.physics.add.existing(this, true)
+        super(scene);
+        this.scene = scene;
+        this.config = config;
+        this.sprites = piezas;
+        this.piezas = [];
+        this.piezaArray = [];
+        this.scene.physics.add.existing(this);
     }
 
     crearTablero() {
-        const { gap, x, y, rows, cols } = this.config
-        const array = Object.entries(this.sprites)
+        const { gap, x, y, rows, cols } = this.config;
+        const array = this.sprites.piezas;
 
         for (let i = 0; i < rows; i++) {
             for (let j = 0; j < cols; j++) {
-                const idx = cols * i + j
-                if (idx > array.length - 1) break
-                const [imageKey, options] = array[idx]
-                const x0 = gap * j + x
-                const y0 = gap * i + y
+                const idx = cols * i + j;
+                if (idx > array.length - 1) break;
+                const config = array[idx];
+                config.pivote = this.sprites.pivote;
+                const x0 = gap * j + x;
+                const y0 = gap * i + y;
 
                 const pieza = new Pieza(
                     this.scene,
                     {
-                        ...options,
-                        imageKey,
+                        ...config,
                         rows,
                         cols,
                         row: i,
                         col: j,
                         x: x0,
                         y: y0
-                    })
+                    });
 
-                this.add(pieza)
-                this.piezaArray.push(pieza)
+                this.add(pieza);
+                this.piezaArray.push(pieza);
             }
         }
     }
 
     redibujar() {
-        this.borrar()
-        this.crearTablero() 
-        this.ordenar()       
+        this.borrar();
+        this.crearTablero();
+        this.ordenar();
+        this.bloquear();
     }
 
     ordenar() {
         this.cuadricular()
-        let anterior = null
-        const origen = new Punto(100, 0)
+        let anterior = null;
+        const origen = new Punto(0);
         for (let i = 0; i < this.config.rows; i++) {
             for (let j = 0; j < this.config.cols; j++) {
                 const child = this.piezas[i][j]
@@ -121,5 +122,11 @@ export default class VistaPrevia extends Phaser.GameObjects.Group {
         }
         this.piezaArray = []
         this.piezas = []
+    }
+
+    bloquear() {
+        for (const g of this.getChildren()) {
+            this.scene.input.setDraggable(g, false);
+        }
     }
 }

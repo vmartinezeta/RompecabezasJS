@@ -1,7 +1,7 @@
 export class Punto {
     constructor(x, y) {
         this.x = x;
-        if(arguments.length === 1) {
+        if(y === undefined) {
             this.y = x;
         } else {
             this.y = y;

@@ -20,8 +20,21 @@ export class TableroMovible extends Phaser.GameObjects.Group {
     }
 
     borrar() {
-        for(const p of this.getChildren()) {
+        for (const p of this.getChildren()) {
             this.remove(p, true, true)
         }
     }
+
+    ocultar() {
+        for (const p of this.getChildren()) {
+            p.setVisible(false);
+        }
+    }
+
+    mostrar() {
+        for (const p of this.getChildren()) {
+            p.setVisible(true);
+        }
+    }
+
 }

@@ -4,33 +4,31 @@ import { Punto } from "../classes/Punto"
 
 export default class Tablero extends Phaser.GameObjects.Group {
     constructor(scene, piezas, config) {
-        super(scene)
-        this.scene = scene
-        this.config = config
-        this.sprites = piezas
+        super(scene);
+        this.scene = scene;
+        this.config = config;
+        this.sprites = piezas;
         this.piezas = [];
         this.crearTablero();
-        // this.desordenar(new Punto(100, 100), 150);
-        this.scene.physics.add.existing(this, true);
+        this.desordenar(new Punto(50, 50), 100);
+        this.scene.physics.add.existing(this);
     }
 
     crearTablero() {
-        const { gap, x, y, rows, cols } = this.config
-        const array = Object.entries(this.sprites)
-
+        const { gap, x, y, rows, cols } = this.config;
+        const array = this.sprites.piezas;
         for (let i = 0; i < rows; i++) {
             for (let j = 0; j < cols; j++) {
                 const idx = cols * i + j;
                 if (idx > array.length - 1) break;
-                const [imageKey, options] = array[idx];
+                const config = array[idx];
+                config.pivote = this.sprites.pivote;
                 const x0 = gap * j + x;
                 const y0 = gap * i + y;
-
                 const pieza = new Pieza(
                     this.scene,
                     {
-                        ...options,
-                        imageKey,
+                        ...config,
                         rows,
                         cols,
                         row: i,
@@ -45,10 +43,16 @@ export default class Tablero extends Phaser.GameObjects.Group {
         }
     }
 
-    redibujar() {
-        this.borrar()
-        this.crearTablero()
-        this.desordenar(new Punto(100, 100), 150)
+    ocultar() {
+        for (const p of this.piezas) {
+            p.setVisible(false);
+        }
+    }
+
+    mostrar() {
+        for (const p of this.piezas) {
+            p.setVisible(true);
+        }        
     }
 
     desordenar(origen, radio) {
@@ -82,12 +86,6 @@ export default class Tablero extends Phaser.GameObjects.Group {
 
     existe(origen, sector) {
         return sector.map(c => c.toString()).includes(origen.toString())
-    }
-
-    borrar() {
-        for (const p of this.piezas) {
-            this.remove(p, true, true)
-        }
     }
 
 }

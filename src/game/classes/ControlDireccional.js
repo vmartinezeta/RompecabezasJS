@@ -11,23 +11,19 @@ export class ControlDireccional {
     }
 
     top() {
-        const direccional = this.direccionales.find(d => d.vector.toString() === this.vector.toString())
-        return direccional && direccional.id === 1
+        return this.direccionales.find(d => d.vector.toString() === this.vector.toString() && d.id === 1) !== undefined;
     }
 
     right() {
-        const direccional = this.direccionales.find(d => d.vector.toString() === this.vector.toString())
-        return direccional && direccional.id === 2
+        return this.direccionales.find(d => d.vector.toString() === this.vector.toString() && d.id === 2) !== undefined;
     }
 
     bottom() {
-        const direccional = this.direccionales.find(d => d.vector.toString() === this.vector.toString())
-        return direccional && direccional.id === 3
+        return this.direccionales.find(d => d.vector.toString() === this.vector.toString() && d.id === 3) !== undefined;
     }
 
     left() {
-        const direccional = this.direccionales.find(d => d.vector.toString() === this.vector.toString())
-        return direccional && direccional.id === 4
+        return this.direccionales.find(d => d.vector.toString() === this.vector.toString() && d.id === 4) !== undefined;
     }
 
     add(direccional) {

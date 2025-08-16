@@ -40,10 +40,6 @@ export default class Pieza extends Phaser.GameObjects.Container {
         this.body.setOffset(x + this.deltaX + pivote, y + this.deltaY + pivote);
     }
 
-    actualizarConfig() {
-
-    }
-
     simple() {
         const base = this.add(new PiezaBase(this.scene, this.config));
         this.enableGroupDrag(base);
