@@ -173,14 +173,14 @@ export class Game extends Scene {
         if (direccional.top()) {
             if (pieza.tienePunta("top")) {
                 pieza.x = estatica.x - 40;
-                pieza.y = estatica.y + 20;
+                pieza.y = estatica.y + 24;
             } else if (pieza.tieneAgujero("top")) {
                 if (pieza.tieneAgujero("left")) {
                     pieza.x = estatica.x + 40;
                     pieza.y = estatica.y + 60;
                 } else {
                     pieza.x = estatica.x;
-                    pieza.y = estatica.y + 60;
+                    pieza.y = estatica.y + 64;
                 }
             }
         } else if (direccional.right()) {

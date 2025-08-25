@@ -3,23 +3,23 @@ import { Direccional } from "../classes/Direccional";
 import { ControlDireccional } from "../classes/ControlDireccional";
 import Phaser from "phaser";
 import PiezaBase from "./PiezaBase";
+import PicoCuadrado from "./PicoCuadrado";
 
-export default class Pieza extends Phaser.GameObjects.Container {
+
+export default class Pieza extends PicoCuadrado {
     constructor(scene, config) {
-        super(scene);
+        super(scene, config);
         this.scene = scene;
-        this.config = config;
+        this.config = {...config, deltaX: 0, deltaY: 0 };
         const { x, y, row, col, pieceWidth, pieceHeight, pivote } = config;
-        this.deltaX = 0;
-        this.deltaY = 0;
         if (this.tienePunta("top")) {
-            this.deltaY = pivote;
+            this.config.deltaY = pivote;
         }
+
         if (this.tienePunta("left")) {
-            this.deltaX = pivote;
+            this.config.deltaX = pivote;
         }
-        config.deltaX = this.deltaX;
-        config.deltaY = this.deltaY;
+
         this.pivote = pivote;
         this.origen = new Punto(row, col);
         this.anterior = new Punto(x, y);
@@ -29,15 +29,16 @@ export default class Pieza extends Phaser.GameObjects.Container {
         this.direccional = new ControlDireccional();
         this.crearDireccionales();
 
-        if (this.getPosition().some(property => config[property])) {
+        if (this.getBorders().some(property => config[property])) {
             this.compuesta();
         } else {
             this.simple();
         }
-        scene.add.existing(this);
+
         scene.physics.add.existing(this);
+        const {deltaX, deltaY} = this.config;
         this.body.setSize(pieceWidth - 2 * pivote, pieceHeight - 2 * pivote);
-        this.body.setOffset(x + this.deltaX + pivote, y + this.deltaY + pivote);
+        this.body.setOffset(x+deltaX+pivote, y+deltaY+pivote);
     }
 
     simple() {
@@ -46,8 +47,8 @@ export default class Pieza extends Phaser.GameObjects.Container {
     }
 
     enableGroupDrag(group) {
-        const { x, deltaX, y, deltaY, pieceWidth, pieceHeight, pivote } = group.config;
-        group.setInteractive(new Phaser.Geom.Rectangle(x + deltaX + pivote, y + deltaY + pivote, pieceWidth - 2 * pivote, pieceHeight - 2 * pivote), Phaser.Geom.Rectangle.Contains);
+        const { x, y, pieceWidth, pieceHeight, pivote, deltaX, deltaY } = group.config;
+        group.setInteractive(new Phaser.Geom.Rectangle(x+deltaX+pivote, y+deltaY+pivote, pieceWidth - 2 * pivote, pieceHeight - 2 * pivote), Phaser.Geom.Rectangle.Contains);
 
         this.scene.input.setDraggable(group)
         this.scene.input.on('dragstart', (_, gameObject) => {
@@ -67,7 +68,7 @@ export default class Pieza extends Phaser.GameObjects.Container {
 
     compuesta() {
         const config = { ...this.config };
-        for (const p of this.getPosition().filter(p => config[p])) {
+        for (const p of this.getBorders().filter(p => config[p])) {
             delete config[p];
         }
 
@@ -75,38 +76,32 @@ export default class Pieza extends Phaser.GameObjects.Container {
         this.enableGroupDrag(base);
 
         const { pivote, pieceWidth, pieceHeight, deltaX, deltaY } = this.config;
-        if (this.config["top"]) {
+        if (this.tienePunta("top")) {
             const pm = (pieceWidth - pivote) / 2;
             this.recortar(pm + deltaX, 0, pivote, pivote);
         }
 
-        if (this.config["right"]) {
+        if (this.tienePunta("right")) {
             const pm = (pieceHeight - pivote) / 2;
             this.recortar(deltaX + pieceWidth, pm + deltaY, pivote, pivote);
         }
 
-        if (this.config["bottom"]) {
+        if (this.tienePunta("bottom")) {
             const pm = (pieceWidth - pivote) / 2;
             this.recortar(pm + deltaX, deltaY + pieceHeight, pivote, pivote);
         }
 
-        if (this.config["left"]) {
+        if (this.tienePunta("left")) {
             const pm = (pieceHeight - pivote) / 2;
             this.recortar(0, pm + deltaY, pivote, pivote);
         }
     }
 
-    getPosition() {
-        return Object.keys(this.config).filter(value => ["top", "right", "bottom", "left"].includes(value))
-    }
-
     recortar(x, y, width, height) {
-        const { x: x0, y: y0, imageKey } = this.config
-        const sprite = this.scene.add.sprite(x0, y0, imageKey)
-        sprite.setOrigin(0)
-        sprite.setCrop(x, y, width, height)
-        this.add(sprite)
-        return sprite
+        const sprite = this.scene.add.sprite(this.config.x, this.config.y, this.config.imageKey);
+        sprite.setOrigin(0);
+        sprite.setCrop(x, y, width, height);
+        this.add(sprite);
     }
 
     siguiente(origen, vector) {
@@ -156,24 +151,12 @@ export default class Pieza extends Phaser.GameObjects.Container {
     }
 
     actual() {
-        return new Punto(this.x+this.deltaX+this.pivote, this.y+this.deltaY+this.pivote);
+        return new Punto(this.x, this.y);
     }
 
     finMovimiento() {
         this.moviendo = false;
         this.anterior = this.actual();
-    }
-
-    existe(property) {
-        return property in this.config;
-    }
-
-    tieneAgujero(property) {
-        return this.existe(property) && !this.config[property];
-    }
-
-    tienePunta(property) {
-        return this.existe(property) && this.config[property];
     }
 
 }
